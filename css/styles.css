@@ -1,6 +1,18 @@
 @charset "utf-8";
 /* CSS Document */
 
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+img {
+  max-width: 100%;
+}
+
+
 body,td,th,p{
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 10pt;
@@ -99,7 +111,7 @@ nav h1 a {
 }
 /* ====================== Map ====================== */
 #map {
-  height: 400px;
+  height: 250px;
   width: 100%;
   background-color: #ccc;
 }
@@ -114,7 +126,7 @@ nav h1 a {
   color: white;
   font-size: 1rem;
   font-weight: normal;
-  line-height: 1;
+  /*line-height: 1;*/
   margin: 0 20px;
 }
 .filter-options select {
@@ -273,3 +285,46 @@ nav h1 a {
 #restaurant-hours td {
   color: #666;
 }
+
+#menu-icon {
+  display: none;
+}
+
+
+@media screen and (max-width: 449px) {
+  header nav {
+    position: relative;
+  }
+  nav h1 {
+    max-width: 250px;
+  }
+  #menu-icon {
+    display: block;
+    position: absolute;
+    bottom: 5px;
+    right: 10px;
+    font-size: 2.5em;
+  }
+  .filter-options {
+    z-index: 10;
+    width: 250px;
+    height: 170px;
+    position: absolute;
+    /* This trasform moves the drawer off canvas. */
+    -webkit-transform: translate(-300px, 0);
+    transform: translate(-300px, 0);
+    /* Optionally, we animate the drawer. */
+    transition: transform 0.3s ease;
+  }
+  .filter-options h2 {
+    font-size: 1.5em;
+  }
+  .filter-options.open {
+    -webkit-transform: translate(0, 0);
+    transform: translate(0, 0);
+  }
+  #restaurants-list {
+    padding: 10px;
+  }
+}
+ 

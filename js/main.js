@@ -78,7 +78,7 @@ initMap = () => {
         scrollWheelZoom: false
       });
   L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
-    mapboxToken: '<your MAPBOX API KEY HERE>',
+    mapboxToken: 'pk.eyJ1IjoibmF0MTMiLCJhIjoiY2psZDI1cnk4MDJudTNxbzZzajRneXZsMCJ9.Q2sP3p63Rv_T0ZsuuYk2cA',
     maxZoom: 18,
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
       '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
@@ -208,4 +208,19 @@ addMarkersToMap = (restaurants = self.restaurants) => {
     self.markers.push(marker);
   });
 } */
+
+/*
+  "Hamburger" menu
+*/
+var menu = document.querySelector('#menu-icon');
+var body = document.querySelector('body');
+var drawer = document.querySelector('.filter-options');
+
+menu.addEventListener('click', function(e) {
+  drawer.classList.toggle('open');
+  e.stopPropagation();
+});
+body.addEventListener('click', function() {
+  drawer.classList.remove('open');
+});
 
