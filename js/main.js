@@ -220,7 +220,9 @@ menu.addEventListener('click', function(e) {
   drawer.classList.toggle('open');
   e.stopPropagation();
 });
+/*
 body.addEventListener('click', function() {
   drawer.classList.remove('open');
 });
+*/
 
