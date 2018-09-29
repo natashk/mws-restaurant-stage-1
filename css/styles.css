@@ -331,6 +331,7 @@ nav h1 a {
     transform: translate(-300px, 0);
     /* Optionally, we animate the drawer. */
     transition: transform 0.3s ease;
+    display: none;
   }
   .filter-options h2 {
     font-size: 1.5em;
@@ -338,6 +339,7 @@ nav h1 a {
   .filter-options.open {
     -webkit-transform: translate(0, 0);
     transform: translate(0, 0);
+    display: block;
   }
 
   #restaurants-list {
