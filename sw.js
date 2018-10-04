@@ -2,6 +2,7 @@ self.addEventListener("install", function(event) {
   event.waitUntil(
     caches.open("mvs_restaurant1").then(function(cache) {
       return cache.addAll([
+        "/",
         "js/dbhelper.js",
         "js/main.js",
         "js/restaurant_info.js",
@@ -48,7 +49,8 @@ function fetchImage(request) {
     return cache.match(url).then(function(response) {
       if (response) return response;
 
-      return fetch(request).then(function(networkResponse) {
+       var requestClone = event.request.clone();
+      return fetch(requestClone).then(function(networkResponse) {
         cache.put(url, networkResponse.clone());
         return networkResponse;
       });
@@ -63,7 +65,8 @@ function fetchRestaurantPage(request) {
     return cache.match(url).then(function(response) {
       if (response) return response;
 
-      return fetch(request).then(function(networkResponse) {
+      var requestClone = event.request.clone();
+      return fetch(requestClone).then(function(networkResponse) {
         cache.put(url, networkResponse.clone());
         return networkResponse;
       });
