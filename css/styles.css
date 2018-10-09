@@ -225,7 +225,7 @@ nav h1 a {
   width: 100%;
 }
 .inside #footer {
-  width: 100%;
+  width: calc(100% - 50px);
 }
 #restaurant-name {
   color: #f18200;

@@ -6,9 +6,11 @@ self.addEventListener("install", function(event) {
         "js/dbhelper.js",
         "js/main.js",
         "js/restaurant_info.js",
+        "js/sw_reg.js",
+        "js/idb.js",
         "css/styles.css",
         "index.html",
-        "data/restaurants.json",
+        //"data/restaurants.json",
         "https://unpkg.com/leaflet@1.3.1/dist/leaflet.js",
         "https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"
       ]);
@@ -49,7 +51,7 @@ function fetchImage(request) {
     return cache.match(url).then(function(response) {
       if (response) return response;
 
-       var requestClone = event.request.clone();
+       var requestClone = request.clone();
       return fetch(requestClone).then(function(networkResponse) {
         cache.put(url, networkResponse.clone());
         return networkResponse;
@@ -65,7 +67,7 @@ function fetchRestaurantPage(request) {
     return cache.match(url).then(function(response) {
       if (response) return response;
 
-      var requestClone = event.request.clone();
+      var requestClone = request.clone();
       return fetch(requestClone).then(function(networkResponse) {
         cache.put(url, networkResponse.clone());
         return networkResponse;
