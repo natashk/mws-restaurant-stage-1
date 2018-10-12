@@ -27,38 +27,32 @@ class DBHelper {
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    dbPromise.then(function(db) {
-      db.transaction("restaurants")
-        .objectStore("restaurants")
-        .getAll().then(function(restaurantsList) {
-          if (!restaurantsList.length) {
-            DBHelper.fetchRestaurantsFromServer(callback);
-          }
-          else {
-            callback(null, restaurantsList);
-          }
+    var pr = fetch(DBHelper.DATABASE_URL, {method: "GET"});
+    pr.then(function(response) {
+      response.json().then(function(restaurants) {
+        //console.log(restaurants);
+        dbPromise.then(function(db) {
+          var tx = db.transaction("restaurants", "readwrite");
+          var store = tx.objectStore("restaurants");
+          restaurants.forEach(function(restaurant) {
+            store.put(restaurant);
+          });
         });
-    });
-  }
-
-  /**
-   * Fetch a restaurants from server.
-   */
-  static fetchRestaurantsFromServer(callback) {
-    fetch(DBHelper.DATABASE_URL, {method: "GET"}).then(function(response) {
-      return response.json();
-    }).then(function(restaurants) {
-      console.log(restaurants);
-      dbPromise.then(function(db) {
-        var tx = db.transaction("restaurants", "readwrite");
-        var store = tx.objectStore("restaurants");
-        restaurants.forEach(function(restaurant) {
-          store.put(restaurant);
-        });
+        callback(null, restaurants);
       });
-      callback(null, restaurants);
     }).catch(function(error) {
-      callback(`Request failed. ${error}`, null);
+      dbPromise.then(function(db) {
+        db.transaction("restaurants")
+          .objectStore("restaurants")
+          .getAll().then(function(restaurantsList) {
+            if (!restaurantsList.length) {
+              callback(`Request failed. ${error}`, null);
+            }
+            else {
+              callback(null, restaurantsList);
+            }
+          });
+      });
     });
   }
 
