@@ -99,7 +99,10 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
     fillRestaurantHoursHTML();
   }
   // fill reviews
-  fillReviewsHTML();
+  var pr = DBHelper.fetchReviewsByRestaurantId(restaurant.id);
+  pr.then(function(reviews) {
+    fillReviewsHTML(reviews);
+  });
 }
 
 /**
@@ -154,7 +157,8 @@ createReviewHTML = (review) => {
   li.appendChild(name);
 
   const date = document.createElement('p');
-  date.innerHTML = review.date;
+  // https://stackoverflow.com/questions/847185/convert-a-unix-timestamp-to-time-in-javascript
+  date.innerHTML = new Date(review.updatedAt).toLocaleDateString("en-US");
   li.appendChild(date);
 
   const rating = document.createElement('p');

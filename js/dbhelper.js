@@ -4,6 +4,10 @@ var dbPromise = idb.open("appDB", 1, function(upgradeDb) {
       var restaurantStore = upgradeDb.createObjectStore("restaurants", {
         keyPath: "id"
       });
+      var reveiwStore = upgradeDb.createObjectStore("reviews", {
+        keyPath: "id"
+      });
+      reveiwStore.createIndex("restaurant_id", "restaurant_id");
   }
 }); 
 
@@ -20,14 +24,14 @@ class DBHelper {
    */
   static get DATABASE_URL() {
     const port = 1337 // Change this to your server port
-    return `http://localhost:${port}/restaurants`;
+    return `http://localhost:${port}/`;
   }
 
   /**
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    var pr = fetch(DBHelper.DATABASE_URL, {method: "GET"});
+    var pr = fetch(DBHelper.DATABASE_URL + "restaurants", {method: "GET"});
     pr.then(function(response) {
       response.json().then(function(restaurants) {
         //console.log(restaurants);
@@ -38,6 +42,7 @@ class DBHelper {
             store.put(restaurant);
           });
         });
+        //DBHelper.fetchReviewsToIDB();
         callback(null, restaurants);
       });
     }).catch(function(error) {
@@ -52,6 +57,55 @@ class DBHelper {
               callback(null, restaurantsList);
             }
           });
+      });
+    });
+  }
+
+  /**
+   * Fetch all reviews.
+   */
+  /*
+  static fetchReviewsToIDB() {
+    var pr = fetch(DBHelper.DATABASE_URL + "reviews/", {method: "GET"});
+    pr.then(function(response) {
+      response.json().then(function(reviews) {
+        console.log(reviews);
+        dbPromise.then(function(db) {
+          var tx = db.transaction("reviews", "readwrite");
+          var store = tx.objectStore("reviews");
+          reviews.forEach(function(review) {
+            store.put(review);
+          });
+        });
+      });
+    });
+  }
+  */
+
+  /**
+   * Fetch a reviews by its RestaurantId.
+   */
+  static fetchReviewsByRestaurantId(rid) {
+    var pr = fetch(DBHelper.DATABASE_URL + "reviews/?restaurant_id=" + rid, {method: "GET"});
+    return pr.then(function(response) {
+      return response.json().then(function(reviews) {
+        //console.log(reviews);
+        return dbPromise.then(function(db) {
+          var tx = db.transaction("reviews", "readwrite");
+          var store = tx.objectStore("reviews");
+          reviews.forEach(function(review) {
+            store.put(review);
+          });
+        }).then(function() {
+          return reviews;
+        });
+      });
+    }).catch(function(error) {
+      return dbPromise.then(function(db) {
+        var tx = db.transaction("reviews");
+        var reviewsStore = tx.objectStore("reviews");
+        var ridIndex = reviewsStore.index("restaurant_id");
+        return ridIndex.getAll(rid);
       });
     });
   }
