@@ -12,6 +12,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
   fetchNeighborhoods();
   fetchCuisines();
 });
+window.addEventListener("load", function() {
+  window.addEventListener("online", DBHelper.updateOfflineChanges);
+});
 
 /**
  * Fetch all neighborhoods and set their HTML.
@@ -166,6 +169,17 @@ createRestaurantHTML = (restaurant) => {
 
   const name = document.createElement('h1');
   name.innerHTML = restaurant.name;
+
+  const favorite = document.createElement('button');
+  favorite.innerHTML = ("" + restaurant.is_favorite) === "true" ? "★" : "☆";
+  favorite.className = "btn-favorite";
+  favorite.id = "fav" + restaurant.id;
+  favorite.onclick = function() {
+    DBHelper.toggleFavorite(restaurant.id);
+  };
+  favorite.title = "Toggle Favorite";
+
+  name.append(favorite);
   li.append(name);
 
   const neighborhood = document.createElement('p');

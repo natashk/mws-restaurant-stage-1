@@ -233,6 +233,49 @@ class DBHelper {
   }
 
   /**
+   * Toggle Favorite
+   */
+  static toggleFavorite(rid) {
+    console.log("toggleFavorite");
+    var newFavoriteVal = !(document.getElementById("fav" + rid).innerHTML === "★");
+    document.getElementById("fav" + rid).innerHTML = newFavoriteVal ? "★" : "☆";
+    var pr = fetch(`${DBHelper.DATABASE_URL}restaurants/${rid}/?is_favorite=${newFavoriteVal}`, {method: "PUT"});
+    pr.then(function(response) {
+      if(response.status === 200) {
+      }
+    });
+    dbPromise.then(function(db) {
+      var tx = db.transaction("restaurants", "readwrite");
+      var restaurantsStore = tx.objectStore("restaurants");
+      restaurantsStore.get(rid).then(function(rec) {
+        rec["is_favorite"] = newFavoriteVal;
+        restaurantsStore.put(rec);
+      });
+    });
+  }
+
+  /**
+   * Update Offline Changes
+   */
+  static updateOfflineChanges() {
+    if(navigator.onLine) {
+      dbPromise.then(function(db) {
+        var tx = db.transaction("restaurants", "readwrite");
+        var restaurantsStore = tx.objectStore("restaurants");
+        restaurantsStore.getAll().then(function(restaurantsList) {
+          console.log(restaurantsList);
+          restaurantsList.forEach(function(restaurant) {
+            var rid = restaurant.id;
+            var newFavoriteVal = restaurant.is_favorite || "false";
+            fetch(`${DBHelper.DATABASE_URL}restaurants/${rid}/?is_favorite=${newFavoriteVal}`, {method: "PUT"});
+          });
+        });
+      });
+      
+    }
+  }
+
+  /**
    * Map marker for a restaurant.
    */
    static mapMarkerForRestaurant(restaurant, map) {
