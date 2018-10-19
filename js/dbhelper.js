@@ -34,7 +34,6 @@ class DBHelper {
     var pr = fetch(DBHelper.DATABASE_URL + "restaurants", {method: "GET"});
     pr.then(function(response) {
       response.json().then(function(restaurants) {
-        //console.log(restaurants);
         dbPromise.then(function(db) {
           var tx = db.transaction("restaurants", "readwrite");
           var store = tx.objectStore("restaurants");
@@ -42,7 +41,6 @@ class DBHelper {
             store.put(restaurant);
           });
         });
-        //DBHelper.fetchReviewsToIDB();
         callback(null, restaurants);
       });
     }).catch(function(error) {
@@ -62,34 +60,12 @@ class DBHelper {
   }
 
   /**
-   * Fetch all reviews.
-   */
-  /*
-  static fetchReviewsToIDB() {
-    var pr = fetch(DBHelper.DATABASE_URL + "reviews/", {method: "GET"});
-    pr.then(function(response) {
-      response.json().then(function(reviews) {
-        console.log(reviews);
-        dbPromise.then(function(db) {
-          var tx = db.transaction("reviews", "readwrite");
-          var store = tx.objectStore("reviews");
-          reviews.forEach(function(review) {
-            store.put(review);
-          });
-        });
-      });
-    });
-  }
-  */
-
-  /**
    * Fetch a reviews by its RestaurantId.
    */
   static fetchReviewsByRestaurantId(rid) {
     var pr = fetch(DBHelper.DATABASE_URL + "reviews/?restaurant_id=" + rid, {method: "GET"});
     return pr.then(function(response) {
       return response.json().then(function(reviews) {
-        //console.log(reviews);
         return dbPromise.then(function(db) {
           var tx = db.transaction("reviews", "readwrite");
           var store = tx.objectStore("reviews");
@@ -236,7 +212,6 @@ class DBHelper {
    * Toggle Favorite
    */
   static toggleFavorite(rid) {
-    console.log("toggleFavorite");
     var newFavoriteVal = !(document.getElementById("fav" + rid).innerHTML === "★");
     document.getElementById("fav" + rid).innerHTML = newFavoriteVal ? "★" : "☆";
     var pr = fetch(`${DBHelper.DATABASE_URL}restaurants/${rid}/?is_favorite=${newFavoriteVal}`, {method: "PUT"});
@@ -255,6 +230,43 @@ class DBHelper {
   }
 
   /**
+   * Submit Review
+   */
+  static submitReview(review) {
+    var pr = fetch(
+      `${DBHelper.DATABASE_URL}reviews/`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        body: JSON.stringify(review)
+      }
+    );
+    pr.then(function(response) {
+      response.json().then(function(newReview){
+        DBHelper.storeReview(newReview);
+      });
+    }).catch(function() {
+      DBHelper.storeReview(review);
+    });
+  }
+
+  /**
+   * Store Review in IDB
+   */
+  static storeReview(review) {
+    if(!review.id) {
+      review.id = `P${(new Date().getTime())}`;
+    }
+    dbPromise.then(function(db) {
+      var tx = db.transaction("reviews", "readwrite");
+      var store = tx.objectStore("reviews");
+      store.put(review);
+    });
+  }
+
+  /**
    * Update Offline Changes
    */
   static updateOfflineChanges() {
@@ -263,7 +275,6 @@ class DBHelper {
         var tx = db.transaction("restaurants", "readwrite");
         var restaurantsStore = tx.objectStore("restaurants");
         restaurantsStore.getAll().then(function(restaurantsList) {
-          console.log(restaurantsList);
           restaurantsList.forEach(function(restaurant) {
             var rid = restaurant.id;
             var newFavoriteVal = restaurant.is_favorite || "false";
@@ -271,7 +282,24 @@ class DBHelper {
           });
         });
       });
-      
+      dbPromise.then(function(db) {
+        var tx = db.transaction("reviews", "readwrite");
+        var reviewsStore = tx.objectStore("reviews");
+        return reviewsStore.openCursor();
+      }).then(function sync(cursor) {
+        if (!cursor) return;
+        if(("" + cursor.value.id).startsWith("P")) {
+          const review = {
+            "restaurant_id": cursor.value.restaurant_id,
+            "name": cursor.value.name,
+            "rating": cursor.value.rating,
+            "comments": cursor.value.comments
+          };
+          DBHelper.submitReview(review);
+          cursor.delete();
+        }
+        return cursor.continue().then(sync);
+      });
     }
   }
 

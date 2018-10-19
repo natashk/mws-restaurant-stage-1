@@ -49,6 +49,25 @@
     <!-- end restaurant -->
     <!-- Beginning reviews -->
     <section id="reviews-container">
+      <div id="review-form">
+        <label for="rf_reviewer_name">Name:</label>
+        <input type="text" id="rf_reviewer_name" placeholder="your name">
+        <label for="rf_rating">Rating:</label>
+        <select id="rf_rating">
+          <option value="0">Choose rating</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+        <label for="rf_comments">Comments:</label>
+        <textarea id="rf_comments" rows="3" placeholder="your comments"></textarea>
+        <div>
+          <button id="rf_submit" title="Submit Review">Submit</button>
+          <button id="rf_cancel" title="Cancel Review">Cancel</button>
+        </div>
+      </div>
       <ul id="reviews-list"></ul>
     </section>
     <!-- End reviews -->

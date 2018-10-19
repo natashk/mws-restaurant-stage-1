@@ -7,6 +7,10 @@ var newMap;
 document.addEventListener('DOMContentLoaded', (event) => {  
   initMap();
 });
+window.addEventListener("load", function() {
+  window.addEventListener("online", DBHelper.updateOfflineChanges);
+});
+
 
 /**
  * Initialize leaflet map
@@ -126,6 +130,39 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
 }
 
 /**
+ * Close Review Form.
+ */
+closeReviewForm = () => {
+  document.getElementById("review-form").classList.remove("open");
+  document.getElementById("rf_reviewer_name").value = "";
+  document.getElementById("rf_rating").value = "";
+  document.getElementById("rf_comments").value = "";
+}
+
+/**
+ * On Submit button click handler.
+ */
+onSubmitReview = () => {
+  const rName = document.getElementById("rf_reviewer_name").value;
+  const rRating = document.getElementById("rf_rating").value;
+  const rComments = document.getElementById("rf_comments").value;
+  if(rName === "" || +rRating === 0 || rComments === "") {
+    alert("Please fill all fields.");
+    return;
+  }
+  const review = {
+    "restaurant_id": self.restaurant.id,
+    "name": rName,
+    "rating": rRating,
+    "comments": rComments
+  };
+  closeReviewForm();
+  DBHelper.submitReview(review);
+  const ul = document.getElementById('reviews-list');
+  ul.appendChild(createReviewHTML(review));
+}
+
+/**
  * Create all reviews HTML and add them to the webpage.
  */
 fillReviewsHTML = (reviews = self.restaurant.reviews) => {
@@ -133,6 +170,20 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   const title = document.createElement('h3');
   title.innerHTML = 'Reviews';
   container.appendChild(title);
+
+  const button = document.createElement('button');
+  button.innerHTML = "Add Review";
+  button.title = "Add Review";
+  button.onclick = function() {
+    document.getElementById("review-form").classList.add("open");
+  };
+  container.appendChild(button);
+
+  document.getElementById("rf_cancel").onclick = closeReviewForm;
+  document.getElementById("rf_submit").onclick = onSubmitReview;
+
+  const form = document.getElementById('review-form');
+  container.appendChild(form);
 
   if (!reviews) {
     const noReviews = document.createElement('p');
@@ -158,7 +209,8 @@ createReviewHTML = (review) => {
 
   const date = document.createElement('p');
   // https://stackoverflow.com/questions/847185/convert-a-unix-timestamp-to-time-in-javascript
-  date.innerHTML = new Date(review.updatedAt).toLocaleDateString("en-US");
+  const dateVal = review.updatedAt ? new Date(review.updatedAt) : new Date();
+  date.innerHTML = dateVal.toLocaleDateString("en-US");
   li.appendChild(date);
 
   const rating = document.createElement('p');

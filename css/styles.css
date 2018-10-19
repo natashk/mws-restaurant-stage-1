@@ -305,6 +305,18 @@ nav h1 a {
   line-height: 1em;
 }
 
+#review-form {
+  display: none;
+  border: solid 1px silver;
+  margin: 10px 0;
+  padding: 10px;
+}
+
+#review-form.open {
+  display: flex;
+  flex-direction: column;
+}
+
 
 @media screen and (max-width: 499px) {
   header nav {
