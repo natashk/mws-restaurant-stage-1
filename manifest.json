@@ -3,13 +3,13 @@
   "name": "Restaurant Reviews Project",
   "icons": [
     {
-      "src": "/favicon.ico",
-      "type": "image/ico",
+      "src": "/img/r_192.png",
+      "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "/favicon.ico",
-      "type": "image/ico",
+      "src": "/img/r_512.png",
+      "type": "image/png",
       "sizes": "512x512"
     }
   ],
